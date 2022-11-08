@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -7,90 +7,123 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Button, IconButton } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import { storage } from './firebase';
-import { getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage';
+import { getDownloadURL, listAll, ref, uploadBytes, deleteObject } from 'firebase/storage';
 import {uid} from "uid"
+
 
 
 
 function App() {
 
-  const typeList = [
-    {label: "Mặt tiền", id: "1"},
-    {label: "Phòng khách", id: "2"},
-    {label: "Phòng thêu", id: "3"},
-    {label: "Phòng da", id: "4"}
-  ]
+  const typeList = ["Mặt tiền", "Phòng khách", "Phòng thêu", "Phòng da"]
   
   const branchList = [
-    {label: "Hồ Chí Minh", id: "1"},
-    {label: "Hà Nội", id: "2"},
-    {label: "Đà Nẵng", id: "3"},
-    {label: "Cần Thơ", id: "4"},
+    "Bà Rịa",
+    "Bạc Liêu",
+    "Bảo Lộc",
+    "Bến Cát",
+    "Bến Lức",
+    "Bến Tre",
+    "Biên Hòa",
+    "Bình Dương",
+    "Bình Phước",
+    "Cà Mau",
+    "Cai Lậy",
+    "Cần Thơ",
+    "Cao Lãnh",
+    "Châu Đốc",
+    "Châu Phú",
+    "Đà Lạt",
+    "Đà Nẵng",
+    "Di Linh",
+    "Dĩ An",
+    "Đông Hà",
+    "Đức Trọng",
+    "Gò Công",
+    "Hà Tiên",
+    "Hà Tĩnh",
+    "Hóc Môn",
+    "Hội An",
+    "Hồng Ngự",
+    "Huế",
+    "Long An",
+    "Long Khánh",
+    "Long Thành",
+    "Long Xuyên",
+    "Mỹ Tho",
+    "Ngã Bảy",
+    "Ngã Năm",
+    "Nha Trang",
+    "Phan Rang",
+    "Phan Thiết",
+    "Quảng Ngãi",
+    "Quy Nhơn",
+    "Rạch Giá",
+    "Sa Đéc",
+    "Sóc Trăng",
+    "Tam Kỳ",
+    "Tây Ninh",
+    "Thốt Nốt",
+    "Thuận An",
+    "Trà Vinh",
+    "Trảng Bàng",
+    "Trảng Bom",
+    "Tri Tôn",
+    "Tuy Hòa",
+    "Vinh",
+    "Vị Thanh",
+    "Vĩnh Châu",
+    "Vĩnh Long",
+    "Vũng Tàu"
   ]
 
-  const itemData = [
-    {
-      img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-      title: 'Breakfast',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-      title: 'Burger',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-      title: 'Camera',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-      title: 'Coffee',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-      title: 'Hats',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-      title: 'Honey',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-      title: 'Basketball',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-      title: 'Fern',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-      title: 'Mushrooms',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
-      title: 'Tomato basil',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
-      title: 'Sea star',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-      title: 'Bike',
-    },
-  ];
   const [branch, setBranch] = useState(branchList[0]);
-  const [inputBranch, setInputBranch] = useState('');
-  const [type, setType] = useState(typeList[0]);
+  const [inputBranch, setInputBranch] = useState("");
+  const [type, setType] = useState("");
   const [inputType, setInputType] = useState("");
   const [image, setImage] = useState(null);
-  // const image = []
-  // const bytes = new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21]);
+  const [listUrl, setListUrl] = useState([]);
+  const test = []
 
-  const handleDelete = (e, item) => {
-    // console.log(e)
-    // console.log(item)
+  // console.log(type)
+  const fetchListAll = async() => {
+    const listRef = ref(storage, `${branch}/${type && type}`);
+    await listAll(listRef)
+        .then(async(res) => {
+              console.log("bbbbb")
+              res.items.map(async(itemRef) => {
+                await getDownloadURL(itemRef)
+                 .then((url) => {console.log("vvvvv"); test.push(url); console.log("kkkk"); setListUrl([...test]) })
+                 .catch((error) => console.log(error))
+             })
+             
+        })
+        .catch((error) => {
+          console.log(error.message, "error getting the image url");
+        });
+  }
+
+  const deletedImage = () => {
+    const desertRef = ref(storage, 'images/desert.jpg');
+  }
+
+  useEffect(() => {
+    setListUrl([])
+    fetchListAll()
+  
+  }, [branch, type])
+
+
+  
+  const handleDelete = (e, url) => {
+    console.log(e)
+    console.log(url)
+    const fileRef = storage.refFromURL(url);
+    fileRef.delete().then(() => {
+      console.log("deleted ok")
+    }).catch((error) => console.log(error))
   }
 
   const handleChange = (e) => {
@@ -102,17 +135,10 @@ function App() {
     }
 
   const handleSubmit = () => {
-    const imageRef = ref(storage, `${branch.label}/${type.label}/${uid(10)}/${image}`);
+    const imageRef = ref(storage, `${branch}/${type}/${image} + ${uid(10)}`);
     uploadBytes(imageRef, image)
       .then(() => {
-        listAll(ref(storage, `${branch.label}/${type.label}`))
-        .then((res) => {
-          console.log("res", res)
-        })
-        .catch((error) => {
-          console.log(error.message, "error getting the image url");
-        });
-      setImage(null);
+        fetchListAll()
       })
       .catch((error) => {
         console.log(error.message);
@@ -122,7 +148,7 @@ function App() {
   return (
     <div style={{height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", border: "1px solid black"}}>
       <Autocomplete
-        disablePortal
+        // disablePortal
         value={branch}
         onChange={(event, newValue) => {
           setBranch(newValue);
@@ -131,14 +157,14 @@ function App() {
         onInputChange={(event, newInputValue) => {
           setInputBranch(newInputValue);
         }}
-        id="combo-box-demo"
+        id="branch"
         options={branchList}
         sx={{ width: 300, marginBottom: "20px" }}
         renderInput={(params) => <TextField {...params} label="Branch" />}
       />
 
       <Autocomplete
-        disablePortal
+        // disablePortal
         value={type}
         onChange={(event, newValue) => {
           setType(newValue);
@@ -147,26 +173,34 @@ function App() {
         onInputChange={(event, newInputValue) => {
           setInputType(newInputValue);
         }}
-        id="combo-box-demo"
+        id="type"
         options={typeList}
         sx={{ width: 300, marginBottom: "20px" }}
         renderInput={(params) => <TextField {...params} label="Type" />}
       />
-
+    {console.log("listUrl")}
     <div style={{border: "1px solid black", width: "550px", height: "550px", overflow: "auto", display: "flex", flexWrap: "wrap"}}>
+        {listUrl.length > 0 ? (
+          listUrl.map((url) => {
+          return (
+            <div style={{border: "1px solid black", width: "250px", height: "250px", overflow: "hidden", position: "relative"}}>
+              <img width="250px" height="250px" src={url} alt="not found" ></img>
+              <IconButton onClick={(e) => handleDelete(e, url)} style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "white", fontSize: "18px"}}>x</IconButton>
+            </div>
+          )
+          }
+         )
+        ) : (
+          <Box sx={{ display: 'flex', position: "relative", top: "50%", left: "50%" }}>
+            <CircularProgress />
+          </Box>
 
-      {itemData.map((item, index) => (
-        <>
-        <div style={{border: "1px solid black", width: "250px", height: "250px", overflow: "hidden", position: "relative"}}>
-          <img key={index} width="250px" height="250px" src={item.img} alt={item.title} ></img>
-          <IconButton onClick={(e) => handleDelete(e, item)} style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "white", fontSize: "18px"}}>x</IconButton>
-        </div>
-        
-      </>
-      ))}
+        )
+        }
+
       
     </div>
-      <input type="file" multiple onChange={handleChange}></input>
+      <input type="file" onChange={handleChange}></input>
       <button onClick={handleSubmit}>Submit</button>
     </div>
   );
