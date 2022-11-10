@@ -1,5 +1,14 @@
 .personal-image {
-    text-align: center;
+    /* text-align: center; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .personal-image input[type="file"] {
     display: none;
@@ -29,7 +38,7 @@
   .personal-figcaption {
     cursor: pointer;
     position: absolute;
-    top: 0px;
+    top: 0;
     width: inherit;
     height: inherit;
     border-radius: 100%;
@@ -47,5 +56,6 @@
       width: 25px;
       height: 25px;
       margin: auto;
-      margin-top: 30px
+      margin-top: 27.5px;
+      margin-left: 27.5px;
   }

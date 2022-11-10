@@ -8,7 +8,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Button, Checkbox, CircularProgress, IconButton } from '@mui/material';
+import { Button, Checkbox, CircularProgress, IconButton, Input } from '@mui/material';
 import { storage } from './firebase';
 import { getDownloadURL, listAll, ref, uploadBytes, deleteObject } from 'firebase/storage';
 import {uid} from "uid"
@@ -96,6 +96,10 @@ function App() {
   const [listUrl, setListUrl] = useState([]);
   const [listUrlDelete, setListUrlDelete] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [checkedRestore, setCheckedRestore] = useState(false);
+  const [restore, setRestore] = useState([]);
+  
+
   const NewListUrl = []
   let quantity = 0;
   // console.log(type)
@@ -138,6 +142,29 @@ function App() {
     }
   }
 
+  const restoreImages = (listRestore) => {
+    for ( let i = 0; i <= listRestore.length; i ++) {
+      if (i < listRestore.length) {
+        const imagesRef = ref(storage, `${branch}/${type}/${images[i]} + ${uid(10)}`);
+        uploadBytes(imagesRef, images[i])
+          .then(() => {
+              quantity += 1
+              // console.log("quantity", quantity)
+              if(quantity === images.length) {
+                console.log("ok con dê")
+                setImages([])
+                setIsLoading(false)
+                setIsFile(true)
+                fetchListAll()
+              }
+          })
+          .catch((error) => {
+            console.log(error.message);
+         }); 
+      }
+    }
+  }
+
   useEffect(() => {
     setListUrl([])
     fetchListAll()
@@ -147,6 +174,7 @@ function App() {
 
   
   const handleDelete = (e, itemRef) => {
+    // setRestore([itemRef])
     // console.log("itemRef", itemRef)
     deleteObject(itemRef).then(() => {
       if (listUrl.length === 1) {
@@ -160,6 +188,7 @@ function App() {
   }
 
   const handleMultipleDelete = () => {
+    setRestore([...listUrlDelete])
     setImages([])
     setListUrlDelete([])
     setIsLoadingDelete(true)
@@ -221,8 +250,44 @@ function App() {
     }
   }
 
+  const handleDeleteAll = () => {
+
+    // setRestore([...listUrlDelete])
+    setImages([])
+    setListUrlDelete([])
+    setIsLoadingDelete(true)
+    console.log("handleMultipleDelete", listUrlDelete)
+
+    for ( let i = 0; i <= listUrlDelete.length; i ++) {
+      if (i < listUrlDelete.length) {
+        deleteObject(listUrlDelete[i]).then(() => {
+          quantity += 1
+          if (listUrl.length === listUrlDelete.length ) {
+            setListUrl([])
+            setImages([])
+            setListUrlDelete([])
+          }
+          if (listUrl.length === 1) {
+            setListUrl([])
+            setImages([])
+            setListUrlDelete([])
+          }
+          if (quantity === listUrlDelete.length) {
+            setListUrlDelete([])
+            setChecked(false)
+            setIsLoadingDelete(false)
+            fetchListAll()
+            setImages([])
+            console.log("images", images)
+          }
+        }).catch((error) => {
+          console.log(error)
+        });
+      }
+    }
+  }
+
   const handleChange = (e) => {
-    debugger
     console.log(e.target.files)
     console.log(images)
     if(e.target.files.length > 0) {
@@ -254,6 +319,18 @@ function App() {
       }
     };
 
+    // const handleChangeCheckBoxRestore = (event) => {
+    //   console.log(event.target.checked)
+    //   setCheckedRestore(event.target.checked);
+    //   if(event.target.checked === true) {
+    //     const ref = storage[0]
+    //     getDownloadURL(ref)
+    //              .then((url) => {NewListUrl.push({url, ref }); setListUrl([...NewListUrl]) })
+    //              .catch((error) => console.log(error))
+    //     console.log("listurllllll" , listUrl)
+    //   }
+    // };
+
   const handleSubmit = () => {
     setIsLoading(true)
     uploadMultipleImages()
@@ -267,7 +344,8 @@ function App() {
         value={branch}
         onChange={(event, newValue) => {
           setBranch(newValue);
-          setListUrl([])
+          setListUrl([]);
+          setChecked(false)
         }}
         inputValue={inputBranch}
         onInputChange={(event, newInputValue) => {
@@ -284,7 +362,8 @@ function App() {
         value={type}
         onChange={(event, newValue) => {
           setType(newValue);
-          setListUrl([])
+          setListUrl([]);
+          setChecked(false)
         }}
         inputValue={inputType}
         onInputChange={(event, newInputValue) => {
@@ -296,6 +375,7 @@ function App() {
         renderInput={(params) => <TextField {...params} label="Type" />}
       />
       </div>
+      {/* {console.log("restore", restore[0])} */}
       <div style={{ width: "80vw", height: "500px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}>
         {listUrl.length > 0 ? (
           listUrl.map((element) => {
@@ -304,7 +384,7 @@ function App() {
               <img onClick={(e) => handleChangeMultipleDeleted(e, element.itemRef)} width="250px" height="250px" src={element.url} alt="not found" ></img>
 
               {listUrlDelete.find((imageRef) => imageRef === element.itemRef) ?
-               (<CheckIcon style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "red", fontSize: "40px"}} />) :
+               (<CheckIcon style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "#00FF33", fontSize: "40px"}} />) :
                (
                <IconButton onClick={(e) => handleDelete(e, element.itemRef)} style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "white", fontSize: "18px"}}>
                 <ClearIcon />
@@ -318,7 +398,8 @@ function App() {
          )
         ) : (
           <Box sx={{ display: 'flex', position: "relative", top: "50%", left: "50%" }}>
-            <CircularProgress />
+            {/* <CircularProgress /> */}
+            <p>Chưa có ảnh nào</p>
           </Box>
 
         )
@@ -333,13 +414,21 @@ function App() {
         />
         <p>Chọn tất cả ảnh</p>
         </div>
+        {/* <div style={{ display: "flex"}}>
+        <Checkbox
+          checked={checkedRestore}
+          onChange={handleChangeCheckBoxRestore}
+          inputProps={{ 'aria-label': 'controlled' }}
+        />
+        <p>Khôi phục ảnh vừa xóa</p>
+        </div> */}
         <p>{ listUrlDelete.length > 0 ? ( `Đã chọn ${listUrlDelete.length} ảnh` ): ("")}</p>
         <p>{ listUrl.length > 0 ? ( `Tổng ${listUrl.length} ảnh` ): ("Chưa có ảnh")}</p>
       </div>
       <div style={{ display: "flex", alignItems: "center"}}>
-      <div className="personal-image">
+        <div className="personal-image">
           <label className="label">
-              <input type="file" multiple onChange={(e) => handleChange(e)} disabled={branch && type ? false : true} />
+              <input type="file" multiple value={""} onChange={(e) => handleChange(e)} disabled={branch && type ? false : true} />
                   <figure className="personal-figure">
                           {urlPreview ? <img src={urlPreview} className="personal-avatar" alt="avatar" /> : 
                           <img src="https://unb.com.bd/public/default.jpg" className="personal-avatar" alt="avatar" />
@@ -347,16 +436,21 @@ function App() {
                         <figcaption className="personal-figcaption">
                             <img src="https://raw.githubusercontent.com/ThiagoLuizNunes/angular-boilerplate/master/src/assets/imgs/camera-white.png" />
                         </figcaption>
-                    </figure>
+                  </figure>
             </label>
         </div>
-        {listUrlDelete.length > 0 ? 
-        (<LoadingButton style={{ width: "auto", height: "50px"}} onClick={handleMultipleDelete} loading={isLoadingDelete} variant="contained">
-            Delete
+        {listUrlDelete.length === 0 ? 
+        (<LoadingButton style={{ width: "auto", height: "50px"}} onClick={handleSubmit} disabled={isFile} loading={isLoading}  variant="contained">
+            Submit
          </LoadingButton>
         ) : 
-        (<LoadingButton style={{ width: "auto", height: "50px"}} onClick={handleSubmit} disabled={isFile} loading={isLoading} variant="contained">
-           Submit
+        checked ? (
+          <LoadingButton style={{ width: "auto", height: "50px"}} onClick={handleDeleteAll} loading={isLoadingDelete} variant="contained">
+           Delete All
+          </LoadingButton>
+        ) :
+        (<LoadingButton style={{ width: "auto", height: "50px"}} onClick={handleMultipleDelete} loading={isLoadingDelete} variant="contained">
+           Delete
           </LoadingButton>)
         }
         </div>
