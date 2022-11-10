@@ -3,12 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDr4gKE-ffs4if7JHQBgEUhpxxZtwr7q-8",
-  authDomain: "upload-image-diva-web.firebaseapp.com",
-  projectId: "upload-image-diva-web",
-  storageBucket: "upload-image-diva-web.appspot.com",
-  messagingSenderId: "121811245987",
-  appId: "1:121811245987:web:7a4da336a3cfd08fad9816"
+  apiKey: "AIzaSyCAJvbhCtA1Pe5c5-etjE8be_X9Fztuods",
+  authDomain: "anh-khong-gian-diva.firebaseapp.com",
+  projectId: "anh-khong-gian-diva",
+  storageBucket: "anh-khong-gian-diva.appspot.com",
+  messagingSenderId: "161885232156",
+  appId: "1:161885232156:web:905882fd02a0c1608e13d9"
 };
 
 const app = initializeApp(firebaseConfig);
