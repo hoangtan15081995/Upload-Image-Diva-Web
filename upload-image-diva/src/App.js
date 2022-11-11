@@ -15,6 +15,9 @@ import {uid} from "uid"
 import LoadingButton from '@mui/lab/LoadingButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
+import Viewer from 'react-viewer';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { AiOutlineDelete } from 'react-icons/ai';
 
 
 
@@ -98,8 +101,10 @@ function App() {
   const [checked, setChecked] = useState(false);
   const [checkedRestore, setCheckedRestore] = useState(false);
   const [restore, setRestore] = useState([]);
+  const [ visible, setVisible ] = useState(false);
+  const [ defaultImg, setDefaultImg ] = useState({});
   
-
+  console.log("listUrl", listUrl)
   const NewListUrl = []
   let quantity = 0;
   // console.log(type)
@@ -109,7 +114,7 @@ function App() {
         .then(async(res) => {
               res.items.map(async(itemRef) => {
                 await getDownloadURL(itemRef)
-                 .then((url) => {NewListUrl.push({url, itemRef}); setListUrl([...NewListUrl]) })
+                 .then((url) => {NewListUrl.push({"src": url, itemRef}); setListUrl([...NewListUrl]) })
                  .catch((error) => console.log(error))
              })
              
@@ -356,7 +361,6 @@ function App() {
         sx={{ width: 300, margin: "20px" }}
         renderInput={(params) => <TextField {...params} label="Branch" />}
       />
-
       <Autocomplete
         disablePortal
         value={type}
@@ -375,13 +379,13 @@ function App() {
         renderInput={(params) => <TextField {...params} label="Type" />}
       />
       </div>
-      {/* {console.log("restore", restore[0])} */}
+      {console.log("defaultImg", defaultImg)}
       <div style={{ width: "80vw", height: "500px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}>
         {listUrl.length > 0 ? (
           listUrl.map((element) => {
           return (
             <div style={{ width: "250px", height: "250px", overflow: "hidden", position: "relative"}}>
-              <img onClick={(e) => handleChangeMultipleDeleted(e, element.itemRef)} width="250px" height="250px" src={element.url} alt="not found" ></img>
+              <img onClick={() => { setVisible(true); setDefaultImg([{"src": element.src}]) } } width="250px" height="250px" src={element.src} alt="not found" ></img>
 
               {listUrlDelete.find((imageRef) => imageRef === element.itemRef) ?
                (<CheckIcon style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "#00FF33", fontSize: "40px"}} />) :
@@ -405,6 +409,17 @@ function App() {
         )
         }  
       </div>
+
+      <Viewer
+      customToolbar = {(props) => 
+        [...props, 
+          {key: "zoomIn", actionType: 1, onClick: () => {console.log("xóa")}} , 
+          { key: "delete", render: <div style={{width: "28px", height: "28px", borderRadius: "28px", position: "relative", top: "3px"}}> <AiOutlineDelete style={{width: "18px", height: "18px"}} /> </div> , onClick: () => {console.log("xóa")} }]}
+      visible={visible}
+      onClose={() => { setVisible(false); } }
+      images={defaultImg}
+      />
+
       <div style={{ width: "80vw", textAlign: "end", display: "flex", justifyContent: "space-between"}}>
         <div style={{ display: "flex"}}>
         <Checkbox
