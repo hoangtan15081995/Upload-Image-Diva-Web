@@ -15,6 +15,11 @@ import {uid} from "uid"
 import LoadingButton from '@mui/lab/LoadingButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
+import Viewer from 'react-viewer';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { AiOutlineDelete } from 'react-icons/ai';
+import AlertMsg from './component/AlertMsg';
+import { toast } from "react-toastify";
 
 
 
@@ -96,20 +101,20 @@ function App() {
   const [listUrl, setListUrl] = useState([]);
   const [listUrlDelete, setListUrlDelete] = useState([]);
   const [checked, setChecked] = useState(false);
-  const [checkedRestore, setCheckedRestore] = useState(false);
-  const [restore, setRestore] = useState([]);
+  const [ visible, setVisible ] = useState(false);
+  const [ defaultImg, setDefaultImg ] = useState({});
+  const [ imageSelected, setImageSelected ] = useState("");
   
-
+  console.log("listUrl", listUrl)
   const NewListUrl = []
   let quantity = 0;
-  // console.log(type)
   const fetchListAll = async() => {
     const listRef = ref(storage, `${branch}/${type && type}`);
     await listAll(listRef)
         .then(async(res) => {
               res.items.map(async(itemRef) => {
                 await getDownloadURL(itemRef)
-                 .then((url) => {NewListUrl.push({url, itemRef}); setListUrl([...NewListUrl]) })
+                 .then((url) => {NewListUrl.push({"src": url, itemRef}); setListUrl([...NewListUrl]) })
                  .catch((error) => console.log(error))
              })
              
@@ -126,8 +131,8 @@ function App() {
         uploadBytes(imagesRef, images[i])
           .then(() => {
               quantity += 1
-              // console.log("quantity", quantity)
               if(quantity === images.length) {
+                toast.success("Upload image success")
                 console.log("ok con dê")
                 setImages([])
                 setIsLoading(false)
@@ -136,34 +141,13 @@ function App() {
               }
           })
           .catch((error) => {
+            toast.error("Upload image fail")
             console.log(error.message);
          }); 
       }
     }
   }
 
-  const restoreImages = (listRestore) => {
-    for ( let i = 0; i <= listRestore.length; i ++) {
-      if (i < listRestore.length) {
-        const imagesRef = ref(storage, `${branch}/${type}/${images[i]} + ${uid(10)}`);
-        uploadBytes(imagesRef, images[i])
-          .then(() => {
-              quantity += 1
-              // console.log("quantity", quantity)
-              if(quantity === images.length) {
-                console.log("ok con dê")
-                setImages([])
-                setIsLoading(false)
-                setIsFile(true)
-                fetchListAll()
-              }
-          })
-          .catch((error) => {
-            console.log(error.message);
-         }); 
-      }
-    }
-  }
 
   useEffect(() => {
     setListUrl([])
@@ -173,22 +157,21 @@ function App() {
 
 
   
-  const handleDelete = (e, itemRef) => {
-    // setRestore([itemRef])
-    // console.log("itemRef", itemRef)
+  const handleDelete = (itemRef) => {
     deleteObject(itemRef).then(() => {
+      toast.success("Deleted success")
       if (listUrl.length === 1) {
         setListUrl([])
       } else {
         fetchListAll()
       }
     }).catch((error) => {
+      toast.error("Deleted fail")
       console.log(error)
     });
   }
 
   const handleMultipleDelete = () => {
-    setRestore([...listUrlDelete])
     setImages([])
     setListUrlDelete([])
     setIsLoadingDelete(true)
@@ -252,7 +235,6 @@ function App() {
 
   const handleDeleteAll = () => {
 
-    // setRestore([...listUrlDelete])
     setImages([])
     setListUrlDelete([])
     setIsLoadingDelete(true)
@@ -273,6 +255,7 @@ function App() {
             setListUrlDelete([])
           }
           if (quantity === listUrlDelete.length) {
+            toast.success("Deleted All success")
             setListUrlDelete([])
             setChecked(false)
             setIsLoadingDelete(false)
@@ -281,6 +264,7 @@ function App() {
             console.log("images", images)
           }
         }).catch((error) => {
+          toast.error("Deleted all fail")
           console.log(error)
         });
       }
@@ -294,12 +278,11 @@ function App() {
       for( let i = 0; i <= e.target.files.length; i ++) {
         if (i === e.target.files.length ) {
           setIsFile(false)
+          setImages([...images])
           console.log("b2")
         }
         if (i < e.target.files.length ) {
           images.push(e.target.files[i])
-          console.log(images)
-          console.log("b1")
         } 
         }
       } else {
@@ -319,18 +302,6 @@ function App() {
       }
     };
 
-    // const handleChangeCheckBoxRestore = (event) => {
-    //   console.log(event.target.checked)
-    //   setCheckedRestore(event.target.checked);
-    //   if(event.target.checked === true) {
-    //     const ref = storage[0]
-    //     getDownloadURL(ref)
-    //              .then((url) => {NewListUrl.push({url, ref }); setListUrl([...NewListUrl]) })
-    //              .catch((error) => console.log(error))
-    //     console.log("listurllllll" , listUrl)
-    //   }
-    // };
-
   const handleSubmit = () => {
     setIsLoading(true)
     uploadMultipleImages()
@@ -338,6 +309,7 @@ function App() {
 
   return (
     <div style={{height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+      <AlertMsg />
       <div style={{height: "auto", display: "flex", justifyContent: "center", alignItems: "center"}}>
       <Autocomplete
         disablePortal
@@ -356,7 +328,6 @@ function App() {
         sx={{ width: 300, margin: "20px" }}
         renderInput={(params) => <TextField {...params} label="Branch" />}
       />
-
       <Autocomplete
         disablePortal
         value={type}
@@ -375,22 +346,22 @@ function App() {
         renderInput={(params) => <TextField {...params} label="Type" />}
       />
       </div>
-      {/* {console.log("restore", restore[0])} */}
+      {console.log("defaultImg", defaultImg)}
       <div style={{ width: "80vw", height: "500px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}>
         {listUrl.length > 0 ? (
           listUrl.map((element) => {
           return (
             <div style={{ width: "250px", height: "250px", overflow: "hidden", position: "relative"}}>
-              <img onClick={(e) => handleChangeMultipleDeleted(e, element.itemRef)} width="250px" height="250px" src={element.url} alt="not found" ></img>
+              <img onClick={() => { setVisible(true); setDefaultImg([{"src": element.src}]); setImageSelected(element.itemRef) } } width="250px" height="250px" src={element.src} alt="not found" ></img>
 
-              {listUrlDelete.find((imageRef) => imageRef === element.itemRef) ?
+              {/* {listUrlDelete.find((imageRef) => imageRef === element.itemRef) ?
                (<CheckIcon style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "#00FF33", fontSize: "40px"}} />) :
                (
                <IconButton onClick={(e) => handleDelete(e, element.itemRef)} style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "white", fontSize: "18px"}}>
                 <ClearIcon />
               </IconButton>
               )
-              }
+              } */}
               
             </div>
           )
@@ -405,6 +376,20 @@ function App() {
         )
         }  
       </div>
+
+      <Viewer
+      customToolbar = {(props) => 
+        [...props
+      ].slice(0,2).concat([...props
+      ].slice(3,4)).concat([...props
+      ].slice(5,9))
+      .concat([{ key: "delete", render: <div style={{width: "28px", height: "28px", borderRadius: "28px", position: "relative", top: "3px"}}> <AiOutlineDelete style={{width: "18px", height: "18px"}} /> </div> , onClick: () => {handleDelete(imageSelected); setVisible(false)} }])
+    }
+      visible={visible}
+      onClose={() => { setVisible(false) } }
+      images={defaultImg}
+      />
+
       <div style={{ width: "80vw", textAlign: "end", display: "flex", justifyContent: "space-between"}}>
         <div style={{ display: "flex"}}>
         <Checkbox
@@ -414,15 +399,8 @@ function App() {
         />
         <p>Chọn tất cả ảnh</p>
         </div>
-        {/* <div style={{ display: "flex"}}>
-        <Checkbox
-          checked={checkedRestore}
-          onChange={handleChangeCheckBoxRestore}
-          inputProps={{ 'aria-label': 'controlled' }}
-        />
-        <p>Khôi phục ảnh vừa xóa</p>
-        </div> */}
-        <p>{ listUrlDelete.length > 0 ? ( `Đã chọn ${listUrlDelete.length} ảnh` ): ("")}</p>
+
+        <p>{ images.length > 0 ? ( `Có ${images.length} ảnh sẵn sàng tải lên` ): ("")}</p>
         <p>{ listUrl.length > 0 ? ( `Tổng ${listUrl.length} ảnh` ): ("Chưa có ảnh")}</p>
       </div>
       <div style={{ display: "flex", alignItems: "center"}}>
