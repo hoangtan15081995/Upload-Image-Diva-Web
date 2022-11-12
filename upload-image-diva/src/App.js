@@ -27,7 +27,7 @@ import { toast } from "react-toastify";
 
 function App() {
 
-  const typeList = ["Mặt tiền", "Phòng khách", "Phòng thêu", "Phòng da"]
+  const typeList = ["Tất cả", "Mặt tiền", "Phòng khách", "Phòng thêu", "Phòng da"]
   
   const branchList = [
     "Bà Rịa",
@@ -104,13 +104,33 @@ function App() {
   const [ visible, setVisible ] = useState(false);
   const [ defaultImg, setDefaultImg ] = useState({});
   const [ imageSelected, setImageSelected ] = useState("");
+  const [ typeAll, setTypeAll ] = useState(false);
   
   console.log("listUrl", listUrl)
   const NewListUrl = []
   let quantity = 0;
   const fetchListAll = async() => {
-    const listRef = ref(storage, `${branch}/${type && type}`);
-    await listAll(listRef)
+    if (type === "Tất cả") {
+      setTypeAll(true)
+      for (let i = 1; i < typeList.length; i++) {
+        const listRef = ref(storage, `${branch}/${typeList[i]}`);
+        await listAll(listRef)
+         .then(async(res) => {
+               res.items.map(async(itemRef) => {
+                 await getDownloadURL(itemRef)
+                  .then((url) => {NewListUrl.push({"src": url, itemRef}); setListUrl([...NewListUrl]) })
+                  .catch((error) => console.log(error))
+              })
+         })
+         .catch((error) => {
+           console.log(error.message, "error getting the images url");
+         });
+      }
+
+    } else {
+       setTypeAll(false)
+       const listRef = ref(storage, `${branch}/${type && type}`);
+       await listAll(listRef)
         .then(async(res) => {
               res.items.map(async(itemRef) => {
                 await getDownloadURL(itemRef)
@@ -122,6 +142,8 @@ function App() {
         .catch((error) => {
           console.log(error.message, "error getting the images url");
         });
+    }
+   
   }
 
   const uploadMultipleImages = () => {
@@ -152,7 +174,7 @@ function App() {
   useEffect(() => {
     setListUrl([])
     fetchListAll()
-  
+    console.log("re render")
   }, [branch, type])
 
 
@@ -346,7 +368,6 @@ function App() {
         renderInput={(params) => <TextField {...params} label="Type" />}
       />
       </div>
-      {console.log("defaultImg", defaultImg)}
       <div style={{ width: "80vw", height: "500px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}>
         {listUrl.length > 0 ? (
           listUrl.map((element) => {
@@ -391,6 +412,7 @@ function App() {
       />
 
       <div style={{ width: "80vw", textAlign: "end", display: "flex", justifyContent: "space-between"}}>
+        {typeAll ? <div></div> : 
         <div style={{ display: "flex"}}>
         <Checkbox
           checked={checked}
@@ -399,10 +421,13 @@ function App() {
         />
         <p>Chọn tất cả ảnh</p>
         </div>
-
-        <p>{ images.length > 0 ? ( `Có ${images.length} ảnh sẵn sàng tải lên` ): ("")}</p>
+        }
+        {typeAll ? <div></div> : 
+          <p>{ images.length > 0 ? ( `Có ${images.length} ảnh sẵn sàng tải lên` ): ("")}</p>
+        }
         <p>{ listUrl.length > 0 ? ( `Tổng ${listUrl.length} ảnh` ): ("Chưa có ảnh")}</p>
       </div>
+      {typeAll ? "" :
       <div style={{ display: "flex", alignItems: "center"}}>
         <div className="personal-image">
           <label className="label">
@@ -432,6 +457,7 @@ function App() {
           </LoadingButton>)
         }
         </div>
+      }
       
       
     </div>
