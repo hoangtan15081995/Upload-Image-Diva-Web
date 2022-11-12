@@ -278,12 +278,11 @@ function App() {
       for( let i = 0; i <= e.target.files.length; i ++) {
         if (i === e.target.files.length ) {
           setIsFile(false)
+          setImages([...images])
           console.log("b2")
         }
         if (i < e.target.files.length ) {
           images.push(e.target.files[i])
-          console.log(images)
-          console.log("b1")
         } 
         }
       } else {
@@ -401,7 +400,7 @@ function App() {
         <p>Chọn tất cả ảnh</p>
         </div>
 
-        <p>{ listUrlDelete.length > 0 ? ( `Đã chọn ${listUrlDelete.length} ảnh` ): ("")}</p>
+        <p>{ images.length > 0 ? ( `Có ${images.length} ảnh sẵn sàng tải lên` ): ("")}</p>
         <p>{ listUrl.length > 0 ? ( `Tổng ${listUrl.length} ảnh` ): ("Chưa có ảnh")}</p>
       </div>
       <div style={{ display: "flex", alignItems: "center"}}>
