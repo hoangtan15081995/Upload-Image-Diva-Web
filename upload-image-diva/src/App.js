@@ -27,66 +27,130 @@ import { toast } from "react-toastify";
 
 function App() {
 
+  const [vinh, setVinh] = useState([]);
+  const [hatinh, setHatinh] = useState([]);
+  const [dongha, setDongha] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+  // const [listUrl, setListUrl] = useState([]);
+
   const typeList = ["Tất cả", "Mặt tiền", "Phòng khách", "Phòng thêu", "Phòng da"]
-  
-  const branchList = [
-    "Bà Rịa",
-    "Bạc Liêu",
-    "Bảo Lộc",
-    "Bến Cát",
-    "Bến Lức",
-    "Bến Tre",
-    "Biên Hòa",
-    "Bình Dương",
-    "Bình Phước",
-    "Cà Mau",
-    "Cai Lậy",
-    "Cần Thơ",
-    "Cao Lãnh",
-    "Châu Đốc",
-    "Châu Phú",
-    "Đà Lạt",
-    "Đà Nẵng",
-    "Di Linh",
-    "Dĩ An",
-    "Đông Hà",
-    "Đức Trọng",
-    "Gò Công",
-    "Hà Tiên",
-    "Hà Tĩnh",
-    "Hóc Môn",
-    "Hội An",
-    "Hồng Ngự",
-    "Huế",
-    "Long An",
-    "Long Khánh",
-    "Long Thành",
-    "Long Xuyên",
-    "Mỹ Tho",
-    "Ngã Bảy",
-    "Ngã Năm",
-    "Nha Trang",
-    "Phan Rang",
-    "Phan Thiết",
-    "Quảng Ngãi",
-    "Quy Nhơn",
-    "Rạch Giá",
-    "Sa Đéc",
-    "Sóc Trăng",
-    "Tam Kỳ",
-    "Tây Ninh",
-    "Thốt Nốt",
-    "Thuận An",
-    "Trà Vinh",
-    "Trảng Bàng",
-    "Trảng Bom",
-    "Tri Tôn",
-    "Tuy Hòa",
+  const branchListString = [
+    "Tất cả",
     "Vinh",
-    "Vị Thanh",
-    "Vĩnh Châu",
-    "Vĩnh Long",
-    "Vũng Tàu"
+    "Hà tĩnh",
+    "Đông hà"
+  ]
+  const branchList = [
+    {name: "Tất cả"},
+    {name: "Vinh", list: vinh},
+    {name: "Hà Tĩnh", list: hatinh},
+    {name:"Đông Hà", list: dongha},
+    // "Huế",
+    // "Đà Nẵng",
+    // "Hội An",
+    // "Tam Kỳ",
+    // "Quảng Ngãi",
+    // "Quy Nhơn",
+    // "Tuy Hòa",
+    // "Nha Trang",
+    // "Phan Rang",
+    // "Phan Thiết",
+    // "Đà Lạt",
+    // "Đức Trọng",
+    // "Di Linh",
+    // "Bảo Lộc",
+    // "Biên Hòa",
+    // "Trảng Bom",
+    // "Long Khánh",
+    // "Long Thành",
+    // "Bà Rịa", 
+    // "Vũng Tàu",
+    // "Dĩ An",
+    // "Thuận An",
+    // "Bình Dương",
+    // "Bến Cát",
+    // "Bình Phước",
+    // "Hóc Môn",
+    // "Tây Ninh",
+    // "Trảng Bàng",
+    // "Long An",
+    // "Bến Lức",
+    // "Mỹ Tho",
+    // "Gò Công",
+    // "Cai Lậy",
+    // "Bến Tre",
+    // "Trà Vinh",
+    // "Vĩnh Long",
+    // "Sa Đéc",
+    // "Cao Lãnh",
+    // "Hồng Ngự",
+    // "Cần Thơ",
+    // "Thốt Nốt",
+    // "Châu Đốc",
+    // "Châu Phú",
+    // "Tri Tôn",
+    // "Long Xuyên",
+    // "Hà Tiên",
+    // "Rạch Giá",
+    // "Sóc Trăng",
+    // "Vĩnh Châu",
+    // "Ngã Năm", 
+    // "Ngã Bảy",
+    // "Vị Thanh",
+    // "Bạc Liêu",
+    // "Cà Mau" 
   ]
 
   const [branch, setBranch] = useState("");
@@ -105,12 +169,57 @@ function App() {
   const [ defaultImg, setDefaultImg ] = useState({});
   const [ imageSelected, setImageSelected ] = useState("");
   const [ typeAll, setTypeAll ] = useState(false);
-  
-  console.log("listUrl", listUrl)
-  const NewListUrl = []
+  // console.log("listUrl", listUrl)
+  let NewListUrl = []
   let quantity = 0;
+  let iAsynchronous = 1;
+  let quantityGet = 0;
   const fetchListAll = async() => {
-    if (type === "Tất cả") {
+
+    if (branch === "Tất cả" && type === "Tất cả") {
+        setTypeAll(true)
+        if (iAsynchronous < branchList.length) {
+          quantity = 0;
+          for (let a = 1; a <= typeList.length; a++) {
+            quantityGet = 0;
+          if (a < typeList.length ) {
+            const listRef = ref(storage, `${branchList[iAsynchronous].name}/${typeList[a]}`);          
+            await listAll(listRef)
+             .then(async(res) => {
+              //  quantity += 1;
+               console.log("quantity", quantity);
+               res.items.map(async(itemRef) => {
+                  quantityGet += 0;
+                  await getDownloadURL(itemRef)
+                  .then((url) => {
+                    NewListUrl.push({"src": url, itemRef}); 
+                    setListUrl([...NewListUrl]);
+                    quantityGet += 1;
+                    console.log("a", quantityGet === res.items.length)
+                    console.log("b", quantity === typeList.length - 1)
+                    if (quantityGet === res.items.length - 1) {
+                      quantity += 1;
+                    }
+                    if ( quantityGet === res.items.length && quantity === typeList.length - 1 ) {
+                      iAsynchronous += 1
+                    }
+                    console.log("quantityGet",iAsynchronous, a, quantityGet, res.items.length)
+                  })
+                  .catch((error) => console.log(error))
+                  })
+             })
+             .catch((error) => {
+               console.log(error.message, "error getting the images url");
+             });
+          }
+
+        }
+        
+
+      }
+    }
+
+    if (branch !== "Tất cả" && type === "Tất cả") {
       setTypeAll(true)
       for (let i = 1; i < typeList.length; i++) {
         const listRef = ref(storage, `${branch}/${typeList[i]}`);
@@ -127,7 +236,9 @@ function App() {
          });
       }
 
-    } else {
+    }
+
+    if (branch !== "Tất cả" && type !== "Tất cả") {
        setTypeAll(false)
        const listRef = ref(storage, `${branch}/${type && type}`);
        await listAll(listRef)
@@ -338,6 +449,7 @@ function App() {
         value={branch}
         onChange={(event, newValue) => {
           setBranch(newValue);
+          setType(newValue === "Tất cả" ? "Tất cả" : type)
           setListUrl([]);
           setChecked(false)
         }}
@@ -346,7 +458,7 @@ function App() {
           setInputBranch(newInputValue);
         }}
         id="branch"
-        options={branchList}
+        options={branchListString}
         sx={{ width: 300, margin: "20px" }}
         renderInput={(params) => <TextField {...params} label="Branch" />}
       />
@@ -369,33 +481,55 @@ function App() {
       />
       </div>
       <div style={{ width: "80vw", height: "500px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}>
-        {listUrl.length > 0 ? (
+        {
+          branch === "Tất cả" && type === "Tất cả" ? (
+            <div > 
+              {branchList.map((branch, index) => {
+                if (index > 0) {
+                  return (
+                      <>
+                        <p> {branch.name} </p>
+                        <div style={{ width: "80vw", height: "300px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}> 
+                        {branch.list.length > 0 ? (
+                          branch.list.map((element) => {
+                          return (
+                            <div style={{ width: "250px", height: "250px", overflow: "hidden", position: "relative"}}>
+                              <img onClick={() => { setVisible(true); setDefaultImg([{"src": element.src}]); setImageSelected(element.itemRef) } } width="250px" height="250px" src={element.src} alt="not found" ></img>              
+                            </div>
+                          )
+                        }
+                          )
+        ) : (
+          <Box sx={{ display: 'flex', position: "relative", top: "50%", left: "50%" }}>
+            <p>Chưa có ảnh nào</p>
+          </Box>
+
+        )}
+        </div>
+                      </>
+                  )
+               }
+              })}
+            </div>
+          ) : (
+          listUrl.length > 0 ? (
           listUrl.map((element) => {
           return (
             <div style={{ width: "250px", height: "250px", overflow: "hidden", position: "relative"}}>
-              <img onClick={() => { setVisible(true); setDefaultImg([{"src": element.src}]); setImageSelected(element.itemRef) } } width="250px" height="250px" src={element.src} alt="not found" ></img>
-
-              {/* {listUrlDelete.find((imageRef) => imageRef === element.itemRef) ?
-               (<CheckIcon style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "#00FF33", fontSize: "40px"}} />) :
-               (
-               <IconButton onClick={(e) => handleDelete(e, element.itemRef)} style={{position: "absolute", top: "0", right: "0", zIndex: "100", color: "white", fontSize: "18px"}}>
-                <ClearIcon />
-              </IconButton>
-              )
-              } */}
-              
+              <img onClick={() => { setVisible(true); setDefaultImg([{"src": element.src}]); setImageSelected(element.itemRef) } } width="250px" height="250px" src={element.src} alt="not found" ></img>              
             </div>
           )
           }
-         )
+              )
         ) : (
           <Box sx={{ display: 'flex', position: "relative", top: "50%", left: "50%" }}>
-            {/* <CircularProgress /> */}
             <p>Chưa có ảnh nào</p>
           </Box>
 
         )
-        }  
+          )
+        }
+        
       </div>
 
       <Viewer
