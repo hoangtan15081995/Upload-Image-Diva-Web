@@ -8,7 +8,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Button, Checkbox, CircularProgress, IconButton, Input } from '@mui/material';
+import { Button, Checkbox, CircularProgress, IconButton, Input, Modal, Typography } from '@mui/material';
 import { storage } from './firebase';
 import { getDownloadURL, listAll, ref, uploadBytes, deleteObject } from 'firebase/storage';
 import {uid} from "uid"
@@ -21,7 +21,22 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import AlertMsg from './component/AlertMsg';
 import { toast } from "react-toastify";
 
-
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  // width: 700,
+  // height: 700,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+  bgcolor: 'background.paper',
+  // border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+}; 
 
 
 
@@ -89,14 +104,14 @@ function App() {
   const branchListString = [
     "Tất cả",
     "Vinh",
-    "Hà tĩnh",
-    "Đông hà"
+    "Hà Tĩnh",
+    "Đông Hà"
   ]
   const branchList = [
     {name: "Tất cả"},
     {name: "Vinh", list: vinh},
     {name: "Hà Tĩnh", list: hatinh},
-    {name:"Đông Hà", list: dongha},
+    {name: "Đông Hà", list: dongha},
     // "Huế",
     // "Đà Nẵng",
     // "Hội An",
@@ -161,49 +176,67 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [isFile, setIsFile] = useState(true);
-  const [urlPreview, setUrlPreview] = useState("");
+  const [urlPreview, setUrlPreview] = useState([]);
   const [listUrl, setListUrl] = useState([]);
   const [listUrlDelete, setListUrlDelete] = useState([]);
   const [checked, setChecked] = useState(false);
   const [ visible, setVisible ] = useState(false);
-  const [ defaultImg, setDefaultImg ] = useState({});
+  const [ defaultImg, setDefaultImg ] = useState([]);
   const [ imageSelected, setImageSelected ] = useState("");
   const [ typeAll, setTypeAll ] = useState(false);
+  // const [ numberOld, setNumberOld ] = useState(0);
+  const [ iAsynchronous, setIAsynchronous ] = useState(1);
   // console.log("listUrl", listUrl)
+  const [open, setOpen] = useState(false);
   let NewListUrl = []
   let quantity = 0;
-  let iAsynchronous = 1;
+  let allImagesNumber = 0
+  // let iAsynchronous = 1;
+  let a = 0;
   let quantityGet = 0;
-  const fetchListAll = async() => {
+  let totalImagesInEachBranch = 0;
 
-    if (branch === "Tất cả" && type === "Tất cả") {
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const fetAllListEachBranch = async() => {
         setTypeAll(true)
-        if (iAsynchronous < branchList.length) {
-          quantity = 0;
-          for (let a = 1; a <= typeList.length; a++) {
-            quantityGet = 0;
-          if (a < typeList.length ) {
-            const listRef = ref(storage, `${branchList[iAsynchronous].name}/${typeList[a]}`);          
+        const fetOneBranch = async () => {
+          a = 0;
+          totalImagesInEachBranch = 0;
+          quantityGet = 0;
+          while (a < typeList.length - 1) {
+            a++
+            console.log(a, iAsynchronous)
+            const listRef = ref(storage, `${branchList[iAsynchronous].name}/${typeList[a]}`);
             await listAll(listRef)
-             .then(async(res) => {
-              //  quantity += 1;
-               console.log("quantity", quantity);
+             .then((res) => {
+              console.log("rểnder", res)
+              totalImagesInEachBranch += res.items.length
                res.items.map(async(itemRef) => {
-                  quantityGet += 0;
-                  await getDownloadURL(itemRef)
-                  .then((url) => {
+                  getDownloadURL(itemRef)
+                  .then( (url) => {
+                    quantityGet += 1
+                    console.log("quantityGet", quantityGet)
+                    console.log(totalImagesInEachBranch)
+                    const condition = quantityGet === totalImagesInEachBranch
                     NewListUrl.push({"src": url, itemRef}); 
                     setListUrl([...NewListUrl]);
-                    quantityGet += 1;
-                    console.log("a", quantityGet === res.items.length)
-                    console.log("b", quantity === typeList.length - 1)
-                    if (quantityGet === res.items.length - 1) {
-                      quantity += 1;
+                    console.log(condition)
+                    if (condition) {
+                      setIAsynchronous(iAsynchronous + 1);
+                      switch (branchList[iAsynchronous].name) {
+                        case "Vinh" : 
+                        setVinh([...NewListUrl])
+                        break;
+                        case "Hà Tĩnh" : 
+                        setHatinh([...NewListUrl])
+                        break;
+                        case "Đông Hà" : 
+                        setDongha([...NewListUrl])
+                        break;
+                      }
                     }
-                    if ( quantityGet === res.items.length && quantity === typeList.length - 1 ) {
-                      iAsynchronous += 1
-                    }
-                    console.log("quantityGet",iAsynchronous, a, quantityGet, res.items.length)
+                    // console.log("iAsynchronous", iAsynchronous)
                   })
                   .catch((error) => console.log(error))
                   })
@@ -211,13 +244,15 @@ function App() {
              .catch((error) => {
                console.log(error.message, "error getting the images url");
              });
-          }
 
+          // } 
+           }
         }
-        
-
-      }
-    }
+        fetOneBranch()
+           
+    // }
+  }
+  const fetchListAll = async() => {
 
     if (branch !== "Tất cả" && type === "Tất cả") {
       setTypeAll(true)
@@ -283,15 +318,21 @@ function App() {
 
 
   useEffect(() => {
-    setListUrl([])
-    fetchListAll()
-    console.log("re render")
-  }, [branch, type])
+      setListUrl([])
+      fetchListAll()
+      console.log("re render")
+  }, [branch, type, iAsynchronous])
 
-
+  useEffect(() => {
+    if (branch === "Tất cả" && iAsynchronous < branchList.length) {
+      fetAllListEachBranch()
+      console.log("re render 2")
+    }
+  }, [branch, type, iAsynchronous])
   
   const handleDelete = (itemRef) => {
     deleteObject(itemRef).then(() => {
+      if (branch === "Tất cả") {setIAsynchronous(1)}
       toast.success("Deleted success")
       if (listUrl.length === 1) {
         setListUrl([])
@@ -408,6 +449,7 @@ function App() {
     console.log(e.target.files)
     console.log(images)
     if(e.target.files.length > 0) {
+      setUrlPreview([...urlPreview, {src: "https://gamek.mediacdn.vn/133514250583805952/2022/5/18/photo-1-16528608926331302726659.jpg"}])
       for( let i = 0; i <= e.target.files.length; i ++) {
         if (i === e.target.files.length ) {
           setIsFile(false)
@@ -486,10 +528,11 @@ function App() {
             <div > 
               {branchList.map((branch, index) => {
                 if (index > 0) {
+                  allImagesNumber += branch.list.length
                   return (
                       <>
-                        <p> {branch.name} </p>
-                        <div style={{ width: "80vw", height: "300px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}> 
+                        <p> {branch.name}  ( {`Có ${branch.list.length} ảnh`} ) </p>
+                        <div style={{ width: "80vw", height: branch.list.length > 0 ? "300px" : "50px", overflow: "auto", display: "flex", flexWrap: "wrap", padding: "20px", backgroundColor: "#EEEEEE"}}> 
                         {branch.list.length > 0 ? (
                           branch.list.map((element) => {
                           return (
@@ -499,19 +542,34 @@ function App() {
                           )
                         }
                           )
-        ) : (
-          <Box sx={{ display: 'flex', position: "relative", top: "50%", left: "50%" }}>
-            <p>Chưa có ảnh nào</p>
-          </Box>
+                       ) : (
+              <Box sx={{ display: 'flex', position: "relative", top: "50%", left: "50%" }}>
+                <p>Chưa có ảnh nào</p>
+              </Box>
 
-        )}
-        </div>
+               )}
+            </div>
                       </>
                   )
                }
               })}
             </div>
           ) : (
+
+          ///// xử lí cho hiển thị ảnh trước khi upload tại đây
+
+          urlPreview.length > 0 ? (
+            urlPreview.map((element) => {
+              return (
+                <div style={{ width: "250px", height: "250px", overflow: "hidden", position: "relative"}}>
+                  <img width="250px" height="250px" src={element.src} alt="not found" ></img>              
+                </div>
+              )
+              }
+                  )
+          ) : (
+
+          
           listUrl.length > 0 ? (
           listUrl.map((element) => {
           return (
@@ -521,12 +579,15 @@ function App() {
           )
           }
               )
-        ) : (
+          ) : (
           <Box sx={{ display: 'flex', position: "relative", top: "50%", left: "50%" }}>
             <p>Chưa có ảnh nào</p>
           </Box>
 
-        )
+          )
+
+          )
+
           )
         }
         
@@ -538,12 +599,34 @@ function App() {
       ].slice(0,2).concat([...props
       ].slice(3,4)).concat([...props
       ].slice(5,9))
-      .concat([{ key: "delete", render: <div style={{width: "28px", height: "28px", borderRadius: "28px", position: "relative", top: "3px"}}> <AiOutlineDelete style={{width: "18px", height: "18px"}} /> </div> , onClick: () => {handleDelete(imageSelected); setVisible(false)} }])
-    }
+      .concat([{ key: "delete", render: <div style={{width: "28px", height: "28px", borderRadius: "28px", position: "relative", top: "3px"}}> <AiOutlineDelete style={{width: "18px", height: "18px"}} /> </div> , onClick: () => { setVisible(false); handleOpen()} }])
+      }
       visible={visible}
       onClose={() => { setVisible(false) } }
       images={defaultImg}
       />
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {/* <Typography id="modal-modal-title" variant="h6" component="h2">
+            Text in a modal
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+          </Typography> */}
+          {console.log("defaultImg", defaultImg)}
+          <img  width="600px" height="600px" src={defaultImg.length > 0 ? defaultImg[0].src : ""} alt="not found" ></img>
+          <div style={{marginTop: "20px"}}>
+            <Button variant='outlined' style={{marginRight: "30px"}} onClick={handleClose}>Cancel</Button>
+            <Button variant='outlined' style={{backgroundColor: "red", color: "white"}} onClick={() => {handleDelete(imageSelected); handleClose()}}>Delete</Button>
+          </div>
+        </Box>
+      </Modal>
 
       <div style={{ width: "80vw", textAlign: "end", display: "flex", justifyContent: "space-between"}}>
         {typeAll ? <div></div> : 
@@ -559,7 +642,15 @@ function App() {
         {typeAll ? <div></div> : 
           <p>{ images.length > 0 ? ( `Có ${images.length} ảnh sẵn sàng tải lên` ): ("")}</p>
         }
-        <p>{ listUrl.length > 0 ? ( `Tổng ${listUrl.length} ảnh` ): ("Chưa có ảnh")}</p>
+        {
+          branch === "Tất cả" && type === "Tất cả" ? (
+            <p>{allImagesNumber > 0 ? ( `Tổng ${allImagesNumber} ảnh` ): ("Chưa có ảnh")}</p>
+          ) : (
+            <p>{ listUrl.length > 0 ? ( `Tổng ${listUrl.length} ảnh` ): ("Chưa có ảnh")}</p>
+          ) 
+        }
+        
+        
       </div>
       {typeAll ? "" :
       <div style={{ display: "flex", alignItems: "center"}}>
@@ -567,9 +658,9 @@ function App() {
           <label className="label">
               <input type="file" multiple value={""} onChange={(e) => handleChange(e)} disabled={branch && type ? false : true} />
                   <figure className="personal-figure">
-                          {urlPreview ? <img src={urlPreview} className="personal-avatar" alt="avatar" /> : 
+                          
                           <img src="https://unb.com.bd/public/default.jpg" className="personal-avatar" alt="avatar" />
-                          } 
+                          
                         <figcaption className="personal-figcaption">
                             <img src="https://raw.githubusercontent.com/ThiagoLuizNunes/angular-boilerplate/master/src/assets/imgs/camera-white.png" />
                         </figcaption>
@@ -592,6 +683,7 @@ function App() {
         }
         </div>
       }
+      {branch && type ? "" : <p style={{color: "red", fontSize: "20px"}}>VUI LÒNG CHỌN BRANCH VÀ TYPE TRƯỚC KHI TẢI ẢNH LÊN</p>}
       
       
     </div>
