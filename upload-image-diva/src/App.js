@@ -1098,7 +1098,6 @@ function App() {
           setIsFile(false);
           setImages([...images]);
           setUrlPreview([...urlPreview]);
-          // console.log("b2")
         }
         if (i < e.target.files.length) {
           images.push(e.target.files[i]);
